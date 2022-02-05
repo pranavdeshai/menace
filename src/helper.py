@@ -50,64 +50,74 @@ def get_winner(board):
     return None
 
 
-def minimax(board, depth, max_turn, alpha, beta, maximizer, minimizer):
-    evaluate = {None: 0, 0: 0, maximizer: 1, minimizer: -1}
+def minimax(board, max_turn, alpha, beta, maximizer, minimizer, cur_depth, req_depth):
+    evaluate = {None: 0, 0: 0, maximizer: 100, minimizer: -100}
     score = evaluate[get_winner(board)]
     next_positions = get_next_positions(board)
 
-    if score == 1 or score == -1:
-        return score
+    # Optimization 3: Quicker wins
+    if score == 100:
+        return score - cur_depth
+    elif score == -100:
+        return score + cur_depth
 
     if get_winner(board) == 0:
         return 0
 
     if max_turn:
-        best = -1000
+        best = -10000
         for position in next_positions:
             board[position] = maximizer
-            best = max(best, minimax(board, depth-1, not max_turn,
-                       alpha, beta, maximizer, minimizer))
+            best = max(best, minimax(board, not max_turn,
+                       alpha, beta, maximizer, minimizer, cur_depth+1, req_depth))
             board[position] = 0
 
+            # Optimization 2: Alpha-beta pruning
             alpha = max(alpha, best)
-            if alpha >= beta or depth == 0:
+            if alpha >= beta or cur_depth == req_depth:
                 break
 
         return best
     else:
-        best = 1000
+        best = 10000
         for position in next_positions:
             board[position] = minimizer
 
-            best = min(best, minimax(board, depth-1, not max_turn,
-                       alpha, beta, maximizer, minimizer))
+            best = min(best, minimax(board, not max_turn,
+                       alpha, beta, maximizer, minimizer, cur_depth+1, req_depth))
 
             board[position] = 0
 
             beta = min(beta, best)
-            if alpha >= beta or depth == 0:
+            if alpha >= beta or cur_depth == req_depth:
                 break
 
         return best
 
 
-def get_best_position(board, maximizer, minimizer,  cache, depth):
+def get_best_position(board, maximizer, minimizer, cache, depth):
     """Return best position for the given board state.
 
     `depth`: Depth limit for minimax search.
     """
 
+    # Optimization 1: Caching
     if str(board) in cache:
         return cache[str(board)]
 
-    best_value = -1000
+    best_value = -10000
     best_position = None
 
     for position in get_next_positions(board):
         board[position] = maximizer
 
+        # Optimization 4: Instant wins
+        if get_winner(board) == maximizer:
+            board[position] = 0
+            return position
+
         position_value = minimax(
-            board[:], depth, False, -1000, 1000, maximizer, minimizer)
+            board[:], False, -1000, 1000, maximizer, minimizer, 0, depth)
 
         board[position] = 0
 
