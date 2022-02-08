@@ -1,16 +1,21 @@
 from helper import get_next_moves, get_best_move, get_winner
-from random import choices
+from random import choices, choice
 from sys import argv
+if '-g' in argv:
+    import matplotlib.pyplot as plt
 
 
-def simulate(m=0, n=100):
-    """Simulate games and return the results.
+def simulate(mode='-r', depth=-1, trials=100, graph=False):
+    """Simulate games against MENACE.
 
-    `m`: Mode of gameplay. Default is 0 (random).
-        [-1, 0, ...] sets depth limit for minimax search. -1 for no limit.
-        -2 to simulate against MENACE and 
-        -3 to play against human.
-    `n`: Number of games to simulate. Default is 100.
+    mode (str): Opponent mode. Defaults to '-r' (random).
+        -r: random
+        -m: minimax
+        -s: self (MENACE-2)
+        -h: human
+    depth (int): Depth limit for minimax search. Defaults to -1 (no limit).
+    trials (int): Number of games to simulate. Defaults to 100.
+    graph (bool): Plot graph of changes. Defaults to False (no graph).
     """
 
     scoreboard = [0, 0, 0]  # Draws, wins and losses (wrt MENACE)
@@ -18,14 +23,14 @@ def simulate(m=0, n=100):
     cache = {}
     menace = {}
 
-    if m == -2:
+    if mode == '-s':
         menace2 = {}
 
     players = [1, 2]
-    for i in range(n):
+    for i in range(trials):
         board = [0 for _ in range(9)]
         menace_moves = set()
-        if m == -2:
+        if mode == '-s':
             menace2_moves = set()
 
         game_over = False
@@ -51,8 +56,12 @@ def simulate(m=0, n=100):
                         # Store the played moves
                         menace_moves.add((state, move))
                     else:
-                        if m == -2:
-                            # Add new board states to MENACE-2
+                        if mode == '-r':
+                            move = choice(next_moves)
+                        elif mode == '-m':
+                            move = get_best_move(
+                                board, next_moves, 2, 1, cache, depth)
+                        elif mode == '-s':
                             state = tuple(board)
                             if state not in menace2:
                                 menace2[state] = {}
@@ -64,21 +73,13 @@ def simulate(m=0, n=100):
                             move = choices(p, w)[0]
 
                             menace2_moves.add((state, move))
-                        elif m == -3:
+                        elif mode == '-h':
                             print(f'{board[:3]}\n{board[3:6]}\n{board[6:]}\n')
 
-                            # Get input from user
                             move = int(input('Move: '))
-
-                            # Validate input
                             while move not in next_moves:
                                 move = int(
                                     input(f'Invalid move. Choose from the below\n{next_moves}: '))
-
-                        else:
-                            # Play the best move
-                            move = get_best_move(
-                                board, next_moves, 2, 1, cache, m)
 
                     board[move] = player
                 else:
@@ -98,7 +99,7 @@ def simulate(m=0, n=100):
                         else:
                             menace[s][i] += 1
 
-                    if m == -2:
+                    if mode == '-m':
                         for s, i in menace2_moves:
                             if winner == 2:
                                 menace2[s][i] += 3
@@ -107,16 +108,34 @@ def simulate(m=0, n=100):
                                     menace2[s][i] -= 1
                             else:
                                 menace2[s][i] += 1
+
                     break
     print(scoreboard)
-    return changes
+
+    if graph:
+        plt.plot(changes)
+        plt.show()
+
+    return
 
 
-params = []
+# Command Line Interface: "python3 menace.py [mode] [trials] [-g]"
+modes = {'-r', '-m', '-s', '-h'}
+kwargs = {}
 for arg in argv[1:]:
-    try:
-        params.append(int(arg))
-    except:
-        print(f'Ignoring invalid argument: {arg}')
+    if arg in modes:
+        kwargs['mode'] = arg
+    elif arg.startswith('-m'):
+        kwargs['mode'] = '-m'
+        try:
+            kwargs['depth'] = int(arg.split('-m')[1])
+        except ValueError:
+            print(f'Error: Depth should be a whole number "{arg}"')
+    elif arg.isnumeric():
+        kwargs['trials'] = int(arg)
+    elif arg == '-g':
+        kwargs['graph'] = True
+    else:
+        print(f'Error: Ignoring invalid argument "{arg}"')
 
-simulate(*params)
+simulate(**kwargs)
