@@ -1,26 +1,56 @@
 # menace
 
-A Python implementation of MENACE (Matchbox Educable Noughts And Crosses Engine)
+Python implementation of MENACE (Matchbox Educable Noughts And Crosses Engine)
+
+# Contents
+
+- [About](#about)
+- [Usage](#usage)
+- [Demonstration](#demonstration)
+- [Requirements](#requirements)
+- [Resources](#resources)
 
 ## About
 
-The program provides a means to simulate the gameplay of the original MENACE, a mechanical artificial intelligence. It further helps understand the basics and operations of a simple neural network and fundamental concepts like weights and reinforcement which are the core of any AI.
+The program provides a means to simulate the gameplay of the original MENACE, a mechanical artificial intelligence.
+
+It further helps understand the basics and operations of a simple neural network and fundamental concepts like weights and reinforcement which are the core of any AI.
+
+## Usage
+
+```
+$ python3 menace.py [mode] [trials] [-g]
+```
+
+-   `mode`: Specifies the opponent mode. Options:
+
+    -   `-r`: random (default)
+    -   `-m`: minimax
+    -   `-s`: self(MENACE-2)
+    -   `-h`: human
+
+-   `trials`: Number of games to simulate. Default is 100.
+
+-   `-g`: Plot a graph of changes.
 
 ## Demonstration
 
 Some interesting results can be observed when the data is visualized. Some of them are shown below.
 
--   Simulation with random moves by opponent
-    ![random-100](assets/random-100.png)
+```
+$ python3 menace.py -g
+```
 
--   Random vs perfect moves by opponent
-    ![random-vs-perfect](assets/random-vs-perfect.png)
+![random-100](res/random-100.png)
 
--   Simulation of 100 games with different opponents
-    ![demo-100](assets/demo-100.png)
+Random vs perfect moves by opponent
+![random-vs-perfect](res/random-vs-perfect.png)
 
--   Simulation of 1000 games with different opponents
-    ![demo-1000](assets/demo-1000.png)
+Simulation of 100 games with different opponents
+![demo-100](res/demo-100.png)
+
+Simulation of 1000 games with different opponents
+![demo-1000](res/demo-1000.png)
 
 ## Requirements
 
