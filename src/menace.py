@@ -99,7 +99,7 @@ def simulate(mode='-r', depth=-1, trials=100, graph=False):
                         else:
                             menace[s][i] += 1
 
-                    if mode == '-m':
+                    if mode == '-s':
                         for s, i in menace2_moves:
                             if winner == 2:
                                 menace2[s][i] += 3
