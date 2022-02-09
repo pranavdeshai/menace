@@ -1,7 +1,7 @@
 from random import shuffle
 
 
-winning_positions = {
+winning_positions = (
     (0, 1, 2),
     (3, 4, 5),
     (6, 7, 8),
@@ -10,8 +10,8 @@ winning_positions = {
     (2, 5, 8),
     (0, 4, 8),
     (2, 4, 6)
-}
-similar_positions = {
+)
+similar_positions = (
     (0, 1, 2, 3, 4, 5, 6, 7, 8),
     (2, 5, 8, 1, 4, 7, 0, 3, 6),  # Rotate 90 degrees anti-clockwise
     (8, 7, 6, 5, 4, 3, 2, 1, 0),  # Rotate 180 degrees anti-clockwise
@@ -20,7 +20,7 @@ similar_positions = {
     (6, 7, 8, 3, 4, 5, 0, 1, 2),  # Flip vertically
     (0, 3, 6, 1, 4, 7, 2, 5, 8),  # Transpose-1
     (8, 5, 2, 7, 4, 1, 6, 3, 0)  # Transpose-2
-}
+)
 
 
 def get_next_moves(board):
@@ -30,10 +30,7 @@ def get_next_moves(board):
 
 
 def get_winner(board):
-    """Return winner for the given board state.
-
-    0 for draw and None if the game is not over yet.
-    """
+    """Return the winner for the given board state."""
 
     for i, j, k in winning_positions:
         if board[i] != 0 and board[i] == board[j] and board[j] == board[k]:
@@ -45,11 +42,8 @@ def get_winner(board):
     return None
 
 
-def get_best_move(board, next_moves, maximizer, minimizer, cache, depth):
-    """Return best move for the given board state.
-
-    depth (int): Depth limit for minimax search.
-    """
+def get_best_move(board, next_moves, maximizer, minimizer, cache):
+    """Return best move for the given board state."""
 
     # Similar positions
     for x in similar_positions:
@@ -69,7 +63,7 @@ def get_best_move(board, next_moves, maximizer, minimizer, cache, depth):
             return move
 
         cur_value = minimax(
-            board[:], False, -1000, 1000, maximizer, minimizer, 0, depth)
+            board[:], False, -1000, 1000, maximizer, minimizer, 0)
 
         board[move] = 0
 
@@ -82,7 +76,9 @@ def get_best_move(board, next_moves, maximizer, minimizer, cache, depth):
     return best_move
 
 
-def minimax(board, max_turn, alpha, beta, maximizer, minimizer, cur_depth, req_depth):
+def minimax(board, max_turn, alpha, beta, maximizer, minimizer, depth):
+    """"Return the best value for the given board state."""
+
     evaluate = {None: 0, 0: 0, maximizer: 100, minimizer: -100}
     score = evaluate[get_winner(board)]
     next_moves = get_next_moves(board)
@@ -92,9 +88,9 @@ def minimax(board, max_turn, alpha, beta, maximizer, minimizer, cur_depth, req_d
 
     # Quicker wins
     if score == 100:
-        return score - cur_depth
+        return score - depth
     elif score == -100:
-        return score + cur_depth
+        return score + depth
 
     if get_winner(board) == 0:
         return 0
@@ -108,12 +104,12 @@ def minimax(board, max_turn, alpha, beta, maximizer, minimizer, cur_depth, req_d
                 return 100000
 
             best = max(best, minimax(board, not max_turn,
-                       alpha, beta, maximizer, minimizer, cur_depth+1, req_depth))
+                       alpha, beta, maximizer, minimizer, depth+1))
             board[move] = 0
 
             # Alpha-beta pruning
             alpha = max(alpha, best)
-            if alpha >= beta or cur_depth == req_depth:
+            if alpha >= beta:
                 break
 
         return best
@@ -126,11 +122,11 @@ def minimax(board, max_turn, alpha, beta, maximizer, minimizer, cur_depth, req_d
                 return -100000
 
             best = min(best, minimax(board, not max_turn,
-                       alpha, beta, maximizer, minimizer, cur_depth+1, req_depth))
+                       alpha, beta, maximizer, minimizer, depth+1))
             board[move] = 0
 
             beta = min(beta, best)
-            if alpha >= beta or cur_depth == req_depth:
+            if alpha >= beta:
                 break
 
         return best
