@@ -117,6 +117,10 @@ def minimax(board, max_turn, alpha, beta, maximizer, minimizer, cur_depth, req_d
         best = -10000
         for move in next_moves:
             board[move] = maximizer
+            if get_winner(board) == maximizer:
+                board[move] = 0
+                return 100000
+
             best = max(best, minimax(board, not max_turn,
                        alpha, beta, maximizer, minimizer, cur_depth+1, req_depth))
             board[move] = 0
@@ -131,6 +135,10 @@ def minimax(board, max_turn, alpha, beta, maximizer, minimizer, cur_depth, req_d
         best = 10000
         for move in next_moves:
             board[move] = minimizer
+            if get_winner(board) == minimizer:
+                board[move] = 0
+                return -100000
+
             best = min(best, minimax(board, not max_turn,
                        alpha, beta, maximizer, minimizer, cur_depth+1, req_depth))
             board[move] = 0
