@@ -1,6 +1,16 @@
 from random import shuffle
 
 
+winning_positions = {
+    (0, 1, 2),
+    (3, 4, 5),
+    (6, 7, 8),
+    (0, 3, 6),
+    (1, 4, 7),
+    (2, 5, 8),
+    (0, 4, 8),
+    (2, 4, 6)
+}
 similar_positions = {
     (0, 1, 2, 3, 4, 5, 6, 7, 8),
     (2, 5, 8, 1, 4, 7, 0, 3, 6),  # Rotate 90 degrees anti-clockwise
@@ -20,40 +30,16 @@ def get_next_moves(board):
 
 
 def get_winner(board):
-    """Return winner (`1` or `2`) for the given board state.
+    """Return winner for the given board state.
 
-    `0` for draw and `None` if the game is not over yet.
+    0 for draw and None if the game is not over yet.
     """
 
-    # Horizontal check
-    for i in (0, 3, 6):
-        if board[i] == board[i+1] and board[i+1] == board[i+2]:
-            if board[i] == 1:
-                return 1
-            elif board[i] == 2:
-                return 2
+    for i, j, k in winning_positions:
+        if board[i] != 0 and board[i] == board[j] and board[j] == board[k]:
+            return board[i]
 
-    # Vertical check
-    for i in range(3):
-        if board[i] == board[i+3] and board[i+3] == board[i+6]:
-            if board[i] == 1:
-                return 1
-            elif board[i] == 2:
-                return 2
-
-    # Diagonal check
-    if board[0] == board[4] and board[4] == board[8]:
-        if board[0] == 1:
-            return 1
-        elif board[0] == 2:
-            return 2
-    if board[2] == board[4] and board[4] == board[6]:
-        if board[2] == 1:
-            return 1
-        elif board[2] == 2:
-            return 2
-
-    if not get_next_moves(board):
+    if board.count(0) == 0:
         return 0
 
     return None
@@ -62,7 +48,7 @@ def get_winner(board):
 def get_best_move(board, next_moves, maximizer, minimizer, cache, depth):
     """Return best move for the given board state.
 
-    `depth`: Depth limit for minimax search.
+    depth (int): Depth limit for minimax search.
     """
 
     # Similar positions
