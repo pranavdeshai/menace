@@ -25,8 +25,8 @@ $ python3 menace.py [mode] [trials] [-g]
 -   `mode`: Specifies the opponent mode. Options:
 
     -   `-r`: random (default)
-    -   `-m`: minimax
-    -   `-s`: self(MENACE-2)
+    -   `-p`: perfect
+    -   `-m`: MENACE-2
     -   `-h`: human
 
 -   `trials`: Number of games to simulate. Default is 100.
