@@ -5,15 +5,14 @@ if '-g' in argv:
     import matplotlib.pyplot as plt
 
 
-def simulate(mode='-r', depth=-1, trials=100, graph=False):
+def simulate(mode='-r', trials=100, graph=False):
     """Simulate games against MENACE.
 
     mode (str): Opponent mode. Defaults to '-r' (random).
         -r: random
-        -m: minimax
-        -s: self (MENACE-2)
+        -p: perfect
+        -m: MENACE-2
         -h: human
-    depth (int): Depth limit for minimax search. Defaults to -1 (no limit).
     trials (int): Number of games to simulate. Defaults to 100.
     graph (bool): Plot graph of changes. Defaults to False (no graph).
     """
@@ -23,14 +22,14 @@ def simulate(mode='-r', depth=-1, trials=100, graph=False):
     cache = {}
     menace = {}
 
-    if mode == '-s':
+    if mode == '-m':
         menace2 = {}
 
     players = [1, 2]
     for i in range(trials):
         board = [0 for _ in range(9)]
         menace_moves = set()
-        if mode == '-s':
+        if mode == '-m':
             menace2_moves = set()
 
         game_over = False
@@ -58,10 +57,10 @@ def simulate(mode='-r', depth=-1, trials=100, graph=False):
                     else:
                         if mode == '-r':
                             move = choice(next_moves)
-                        elif mode == '-m':
+                        elif mode == '-p':
                             move = get_best_move(
-                                board, next_moves, 2, 1, cache, depth)
-                        elif mode == '-s':
+                                board, next_moves, 2, 1, cache)
+                        elif mode == '-m':
                             state = tuple(board)
                             if state not in menace2:
                                 menace2[state] = {}
@@ -99,7 +98,7 @@ def simulate(mode='-r', depth=-1, trials=100, graph=False):
                         else:
                             menace[s][i] += 1
 
-                    if mode == '-s':
+                    if mode == '-m':
                         for s, i in menace2_moves:
                             if winner == 2:
                                 menace2[s][i] += 3
@@ -113,24 +112,19 @@ def simulate(mode='-r', depth=-1, trials=100, graph=False):
     print(scoreboard)
 
     if graph:
+        plt.title(modes[mode])
         plt.plot(changes)
         plt.show()
 
     return
 
 
-# Command Line Interface: "python3 menace.py [mode] [trials] [-g]"
-modes = {'-r', '-m', '-s', '-h'}
+# Command Line Interface: "python3 menace.py [mode] [trials] [graph]"
+modes = {'-r': 'Random', '-p': 'Perfect', '-m': 'MENACE-2', '-h': 'Human'}
 kwargs = {}
 for arg in argv[1:]:
     if arg in modes:
         kwargs['mode'] = arg
-    elif arg.startswith('-m'):
-        kwargs['mode'] = '-m'
-        try:
-            kwargs['depth'] = int(arg.split('-m')[1])
-        except ValueError:
-            print(f'Error: Depth should be a whole number "{arg}"')
     elif arg.isnumeric():
         kwargs['trials'] = int(arg)
     elif arg == '-g':
