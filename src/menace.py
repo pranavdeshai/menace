@@ -130,6 +130,6 @@ for arg in argv[1:]:
     elif arg == '-g':
         kwargs['graph'] = True
     else:
-        print(f'Error: Ignoring invalid argument "{arg}"')
+        print(f'Ignoring illegal argument: "{arg}"')
 
 simulate(**kwargs)
