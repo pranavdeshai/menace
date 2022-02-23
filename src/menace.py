@@ -1,11 +1,13 @@
-from helper import get_next_moves, get_best_move, get_winner
-from random import choices, choice
+from random import choice, choices
 from sys import argv
-if '-g' in argv:
+
+from helper import get_best_move, get_next_moves, get_winner
+
+if "-g" in argv:
     import matplotlib.pyplot as plt
 
 
-def simulate(mode='-r', trials=100, graph=False):
+def simulate(mode="-r", trials=100, graph=False):
     """Simulate games against MENACE.
 
     mode (str): Opponent mode. Defaults to '-r' (random).
@@ -19,17 +21,16 @@ def simulate(mode='-r', trials=100, graph=False):
 
     scoreboard = [0, 0, 0]  # Draws, wins and losses (wrt MENACE)
     changes = []
-    cache = {}
     menace = {}
 
-    if mode == '-m':
+    if mode == "-m":
         menace2 = {}
 
     players = [1, 2]
     for i in range(trials):
         board = [0 for _ in range(9)]
         menace_moves = set()
-        if mode == '-m':
+        if mode == "-m":
             menace2_moves = set()
 
         game_over = False
@@ -55,12 +56,11 @@ def simulate(mode='-r', trials=100, graph=False):
                         # Store the played moves
                         menace_moves.add((state, move))
                     else:
-                        if mode == '-r':
+                        if mode == "-r":
                             move = choice(next_moves)
-                        elif mode == '-p':
-                            move = get_best_move(
-                                board, next_moves, 2, 1, cache)
-                        elif mode == '-m':
+                        elif mode == "-p":
+                            move = get_best_move(board, next_moves, 2, 1)
+                        elif mode == "-m":
                             state = tuple(board)
                             if state not in menace2:
                                 menace2[state] = {}
@@ -72,21 +72,23 @@ def simulate(mode='-r', trials=100, graph=False):
                             move = choices(p, w)[0]
 
                             menace2_moves.add((state, move))
-                        elif mode == '-h':
-                            print(f'{board[:3]}\n{board[3:6]}\n{board[6:]}\n')
+                        elif mode == "-h":
+                            print(f"{board[:3]}\n{board[3:6]}\n{board[6:]}\n")
 
-                            move = int(input('Move: '))
+                            move = int(input("Move: "))
                             while move not in next_moves:
                                 move = int(
-                                    input(f'Invalid move. Choose from the below\n{next_moves}: '))
+                                    input(
+                                        f"Invalid move. Choose from the below\n{next_moves}: "
+                                    )
+                                )
 
                     board[move] = player
                 else:
                     scoreboard[winner] += 1
                     game_over = True
 
-                    changes.append(
-                        3*scoreboard[1] + scoreboard[0] - scoreboard[2])
+                    changes.append(3 * scoreboard[1] + scoreboard[0] - scoreboard[2])
 
                     # Reinforce MENACE
                     for s, i in menace_moves:
@@ -98,7 +100,7 @@ def simulate(mode='-r', trials=100, graph=False):
                         else:
                             menace[s][i] += 1
 
-                    if mode == '-m':
+                    if mode == "-m":
                         for s, i in menace2_moves:
                             if winner == 2:
                                 menace2[s][i] += 3
@@ -120,15 +122,15 @@ def simulate(mode='-r', trials=100, graph=False):
 
 
 # Command Line Interface: "python3 menace.py [mode] [trials] [graph]"
-modes = {'-r': 'Random', '-p': 'Perfect', '-m': 'MENACE-2', '-h': 'Human'}
+modes = {"-r": "Random", "-p": "Perfect", "-m": "MENACE-2", "-h": "Human"}
 kwargs = {}
 for arg in argv[1:]:
     if arg in modes:
-        kwargs['mode'] = arg
+        kwargs["mode"] = arg
     elif arg.isnumeric():
-        kwargs['trials'] = int(arg)
-    elif arg == '-g':
-        kwargs['graph'] = True
+        kwargs["trials"] = int(arg)
+    elif arg == "-g":
+        kwargs["graph"] = True
     else:
         print(f'Ignoring illegal argument: "{arg}"')
 

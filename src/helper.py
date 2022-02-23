@@ -1,6 +1,6 @@
 from random import shuffle
 
-
+cache = {}
 winning_positions = (
     (0, 1, 2),
     (3, 4, 5),
@@ -9,7 +9,7 @@ winning_positions = (
     (1, 4, 7),
     (2, 5, 8),
     (0, 4, 8),
-    (2, 4, 6)
+    (2, 4, 6),
 )
 similar_positions = (
     (0, 1, 2, 3, 4, 5, 6, 7, 8),
@@ -19,7 +19,7 @@ similar_positions = (
     (2, 1, 0, 5, 4, 3, 8, 7, 6),  # Flip horizontally
     (6, 7, 8, 3, 4, 5, 0, 1, 2),  # Flip vertically
     (0, 3, 6, 1, 4, 7, 2, 5, 8),  # Transpose-1
-    (8, 5, 2, 7, 4, 1, 6, 3, 0)  # Transpose-2
+    (8, 5, 2, 7, 4, 1, 6, 3, 0),  # Transpose-2
 )
 
 
@@ -42,7 +42,7 @@ def get_winner(board):
     return None
 
 
-def get_best_move(board, next_moves, maximizer, minimizer, cache):
+def get_best_move(board, next_moves, maximizer, minimizer):
     """Return best move for the given board state."""
 
     # Similar positions
@@ -62,8 +62,7 @@ def get_best_move(board, next_moves, maximizer, minimizer, cache):
             board[move] = 0
             return move
 
-        cur_value = minimax(
-            board[:], False, -1000, 1000, maximizer, minimizer, 0)
+        cur_value = minimax(board[:], False, -1000, 1000, maximizer, minimizer, 0)
 
         board[move] = 0
 
@@ -77,7 +76,7 @@ def get_best_move(board, next_moves, maximizer, minimizer, cache):
 
 
 def minimax(board, max_turn, alpha, beta, maximizer, minimizer, depth):
-    """"Return the best value for the given board state."""
+    """Return the best value for the given board state."""
 
     evaluate = {None: 0, 0: 0, maximizer: 100, minimizer: -100}
     score = evaluate[get_winner(board)]
@@ -103,8 +102,12 @@ def minimax(board, max_turn, alpha, beta, maximizer, minimizer, depth):
                 board[move] = 0
                 return 100000
 
-            best = max(best, minimax(board, not max_turn,
-                       alpha, beta, maximizer, minimizer, depth+1))
+            best = max(
+                best,
+                minimax(
+                    board, not max_turn, alpha, beta, maximizer, minimizer, depth + 1
+                ),
+            )
             board[move] = 0
 
             # Alpha-beta pruning
@@ -121,8 +124,12 @@ def minimax(board, max_turn, alpha, beta, maximizer, minimizer, depth):
                 board[move] = 0
                 return -100000
 
-            best = min(best, minimax(board, not max_turn,
-                       alpha, beta, maximizer, minimizer, depth+1))
+            best = min(
+                best,
+                minimax(
+                    board, not max_turn, alpha, beta, maximizer, minimizer, depth + 1
+                ),
+            )
             board[move] = 0
 
             beta = min(beta, best)
