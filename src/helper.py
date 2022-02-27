@@ -91,7 +91,7 @@ def minimax(board, max_turn, alpha, beta, maximizer, minimizer, depth):
     elif score == -100:
         return score + depth
 
-    if board.conut(0) == 0:
+    if board.count(0) == 0:
         return 0
 
     if max_turn:
