@@ -26,6 +26,9 @@ def simulate(mode="-r", trials=100, graph=False):
     if mode == "-m":
         menace2 = {}
 
+    if mode == "-h":
+        trials = 1
+
     players = [1, 2]
     for i in range(trials):
         board = [0 for _ in range(9)]
@@ -73,7 +76,18 @@ def simulate(mode="-r", trials=100, graph=False):
 
                             menace2_moves.add((state, move))
                         elif mode == "-h":
-                            print(f"{board[:3]}\n{board[3:6]}\n{board[6:]}\n")
+                            print(
+                                f"""
+-------------
+| {board[0]} | {board[1]} | {board[2]} |
+-------------
+| {board[3]} | {board[4]} | {board[5]} |
+-------------
+| {board[6]} | {board[7]} | {board[8]} |
+-------------""".replace("0", " ")
+                                .replace("1", "X")
+                                .replace("2", "O")
+                            )
 
                             move = int(input("Move: "))
                             while move not in next_moves:
@@ -87,6 +101,9 @@ def simulate(mode="-r", trials=100, graph=False):
                 else:
                     scoreboard[winner] += 1
                     game_over = True
+
+                    if mode == "-h":
+                        print(f"Winner: {winner}")
 
                     changes.append(3 * scoreboard[1] + scoreboard[0] - scoreboard[2])
 
@@ -111,7 +128,12 @@ def simulate(mode="-r", trials=100, graph=False):
                                 menace2[s][i] += 1
 
                     break
-    print(scoreboard)
+    if mode != "-h":
+        print(
+            f"""MENACE:   {scoreboard[1]}
+Opponent: {scoreboard[2]}
+Draws:    {scoreboard[0]}"""
+        )
 
     if graph:
         plt.title(modes[mode])
